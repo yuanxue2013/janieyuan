@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>滤镜应用</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../lib/jquery-3.2.1.js"></script>
+    <script src="../lib/vue.js"></script>
+    <script src="../js/index.js"></script>
+</head>
+<body>
+
+<div class="header">
+    <h1>滤镜应用</h1>
+</div>
+
+<div class="nav-container">
+    <div v-for="item in items">
+        <a v-bind:data-url="item.url">{{item.title}}</a>
+    </div>
+</div>
+
+<div class="filter-container">
+    <iframe src="blank.html"></iframe>
+</div>
+
+
+<script>
+
+    function calcDistanceWeight(sigma, x, y) {
+        return Math.exp(-0.5*(Math.pow(x, 2) + Math.pow(y, 2)) / (sigma*sigma));
+    }
+
+    console.log("w=" + calcDistanceWeight(0.5, 1, 1));
+
+</script>
+
+</body>
+</html>
+

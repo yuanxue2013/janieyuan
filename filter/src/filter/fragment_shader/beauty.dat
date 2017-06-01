@@ -1,0 +1,78 @@
+//肤色提取+双边滤波美颜
+
+varying vec2 vTextureCoord;
+varying vec4 vColor;
+
+uniform sampler2D texture;
+
+uniform float distanceSigma;
+uniform float simularitySigma;
+
+uniform float canvasWidth;
+uniform float canvasHeight;
+
+float calcSimularityWeight(float sigma, vec4 color1, vec4 color2){
+    return exp(-0.5*(pow(color1.r - color2.r, 2.0) + pow(color1.g - color2.g, 2.0) + pow(color1.b - color2.b, 2.0)) / pow(sigma, 2.0));
+}
+
+float calcDistanceWeight(float sigma, vec2 texCoord){
+    return exp(-0.5*(pow(texCoord.x, 2.0) + pow(texCoord.y, 2.0)) / pow(sigma, 2.0));
+}
+
+
+void main() {
+
+
+    vec4 color = vec4(0.0);
+    vec2 offset = vec2(0.0, 0.0);
+    float wStep = 1.0/canvasWidth;
+    float hStep = 1.0/canvasHeight;
+
+    vec4 orignalColor  = texture2D(texture, vTextureCoord);
+
+    float r = orignalColor.r;
+    float g = orignalColor.g;
+    float b = orignalColor.b;
+
+
+
+    //肤色提取仅供临时使用， 正规的颜色模型建设还在学习中。
+    if(r - g > 0.03 &&
+    r > b &&                        //肤色基本上都是R最高
+    abs(r - 210.0/255.0) < 0.4 &&   //限定R范围
+    r - g < 0.35 &&                 //限定RG范围
+    g - b > -0.1 &&                  //限定GB范围
+    g - b < 0.25 &&                  //限定GB范围
+    (r - g) - (g - b) > -0.14 &&    //去掉偏绿部分
+    !(r - g < 0.058 && g - b < 0.058)&& //去掉偏白和偏黑部分
+    !(r-g>0.3 && g-b<0.12) &&        //去掉偏红部分
+    r > 0.55){                      //去掉偏黑
+
+
+    float tempW = 0.0;
+    vec2 tempCoord;
+    vec4 tempColor;
+    float total = 0.0;
+
+    for(float i = -3.0; i <= 3.0; i+= 1.0){
+        for(float j = -3.0; j <= 3.0; j += 1.0){
+            tempCoord = vTextureCoord.xy + vec2(wStep*i, hStep*j);
+            tempColor = texture2D(texture, tempCoord);
+
+            //双边
+            tempW = calcSimularityWeight(simularitySigma, orignalColor, tempColor) * calcDistanceWeight(distanceSigma, vec2(i, j));
+
+            color = color + tempColor * tempW;
+            total += tempW;
+        }
+    }
+
+
+    gl_FragColor = vec4(color.rgb/total, 1.0);
+    }
+    else{
+        gl_FragColor = orignalColor;
+    }
+
+}
+

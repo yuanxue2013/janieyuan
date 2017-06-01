@@ -1,0 +1,77 @@
+<html>
+<head>
+    <script src="../../lib/jquery-3.2.1.js"></script>
+    <script src="../../lib/pixi.js"></script>
+    <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+<div class="effect">
+    <img src="../../img/colorwheel.png"/>
+</div>
+<div class="parameters">
+    <div><span>饱和度</span><input id="saturation" min="0.0" max="2.0" step="0.01" type="range"><span></span></div>
+</div>
+
+
+<script>
+
+    var orignalImg = $("img");
+    var imgPath = orignalImg.attr("src");
+    var filter;
+
+    var app = new PIXI.Application(orignalImg.width(), orignalImg.height());
+    $(".effect").append(app.view);
+
+    var background = PIXI.Sprite.fromImage(imgPath);
+    background.width = orignalImg.width();
+    background.height = orignalImg.height();
+
+
+    app.stage.addChild(background);
+    app.stop();
+
+
+    PIXI.loader.add('shader', '../shader/skinColorRangeTest.frag').load(onLoaded);
+    function onLoaded(loader, res) {
+
+        filter = new PIXI.Filter(null, res.shader.data);
+
+        background.filters = [filter];
+
+
+        filter.uniforms.canvasWidth = background.width;
+        filter.uniforms.canvasHeight = background.height;
+
+        filter.uniforms.colorArr = [
+            .96, .75, .67,
+            .82, .64, .54,
+            .85, .69, .62,
+            .78, .47, .33,
+            .99, .91, .86,
+            .96, .90, .90,
+            .97, .93, .91,
+            .84, .68, .60,
+            .80, .61, .53,
+            .98, .87, .81,
+            .87, .78, .67
+        ];
+
+
+        app.start();
+
+        addSliderListener();
+
+        $("#saturation").trigger("input");
+    }
+
+    function addSliderListener() {
+        $("#saturation").bind("input propertychange", function () {
+            var val = $("#saturation").val();
+            filter.uniforms.saturation = val;
+            $("#saturation~span").text(val);
+        });
+    }
+
+</script>
+</body>
+</html>

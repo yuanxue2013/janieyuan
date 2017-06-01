@@ -1,0 +1,26 @@
+<html>
+<head>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../lib/jquery-3.2.1.js"></script>
+    <script src="../lib/pixi.min.js"></script>
+    <script src="../lib/vue.js"></script>
+    <script src="../js/blank.js"></script>
+</head>
+<body>
+<div id="main">
+    <div class="effect">
+        <img src="../img/girl.jpg"/>
+    </div>
+    <div class="parameters">
+        <div v-for="item in slider">
+            <span>{{item.name}}</span>
+            <input id="saturation" v-bind:id=item.uniform v-bind:min=item.min v-bind:max=item.max v-bind:step=item.step type="range">
+            <span></span>
+        </div>
+    </div>
+
+</div>
+
+
+</body>
+</html>

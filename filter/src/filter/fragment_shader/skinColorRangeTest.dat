@@ -1,0 +1,30 @@
+
+uniform sampler2D texture;
+uniform vec3 colorArr[100];
+
+varying vec2 vTextureCoord;
+
+const vec3 luminanceWeighting = vec3(0.2125, 0.7154, 0.0721);
+
+void main()
+{
+    vec4 textureColor = texture2D(texture, vTextureCoord);
+    bool colorInArr = false;
+
+    for(int i = 0; i < 100; i ++){
+        if(abs(colorArr[i].r - textureColor.r) < 0.01
+           && abs(colorArr[i].g - textureColor.g) < 0.01
+           && abs(colorArr[i].b - textureColor.b) < 0.01 ){
+            gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+            colorInArr = true;
+            break;
+        }
+    }
+    if(colorInArr == true){
+        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    }
+    else{
+        gl_FragColor = vec4(1.0/255.0 * vTextureCoord.x) textureColor;
+    }
+
+}

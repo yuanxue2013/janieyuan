@@ -1,0 +1,32 @@
+varying vec2 vTextureCoord;
+uniform sampler2D texture;
+
+
+void main()
+{
+    vec4 textureColor = texture2D(texture, vTextureCoord);
+
+    float r = textureColor.r;
+    float g = textureColor.g;
+    float b = textureColor.b;
+
+
+    if(r - g > 0.03 &&
+    r > b &&                        //肤色基本上都是R最高
+    abs(r - 210.0/255.0) < 0.4 &&   //限定R范围
+    r - g < 0.35 &&                 //限定RG范围
+    g - b > -0.1 &&                  //限定GB范围
+    g - b < 0.25 &&                  //限定GB范围
+    (r - g) - (g - b) > -0.14 &&    //去掉偏绿部分
+    !(r - g < 0.058 && g - b < 0.058)&& //去掉偏白和偏黑部分
+    !(r-g>0.3 && g-b<0.12) &&        //去掉偏红部分
+    r > 0.55){                      //去掉偏黑
+
+
+
+        gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    }
+    else{
+        gl_FragColor = textureColor;
+    }
+}

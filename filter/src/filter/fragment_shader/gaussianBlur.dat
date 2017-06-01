@@ -1,0 +1,47 @@
+varying vec2 vTextureCoord;
+
+uniform sampler2D texture;
+uniform float sigma;
+
+uniform float canvasWidth;
+uniform float canvasHeight;
+
+
+float calcDistanceWeight(float sigma, vec2 texCoord){
+    return exp(-0.5*(pow(texCoord.x, 2.0) + pow(texCoord.y, 2.0)) / pow(sigma, 2.0));
+}
+
+void main() {
+
+    float wStep = 1.0/canvasWidth;
+    float hStep = 1.0/canvasHeight;
+
+    vec4 orignalColor  = texture2D(texture, vTextureCoord);
+
+    float total = 0.0;
+    float tempW = 0.0;
+    vec2 tempCoord;
+    vec4 tempColor;
+    vec4 color = vec4(0.0);
+
+    for(float i = -9.0; i <= 9.0; i+= 1.0){
+        for(float j = -9.0; j <= 9.0; j += 1.0){
+
+            tempCoord = vTextureCoord.xy + vec2(wStep*i, hStep*j);
+
+            tempColor = texture2D(texture, tempCoord);
+
+            //空间域
+            tempW = calcDistanceWeight(sigma, vec2(i, j));
+
+            color = color + tempColor * tempW;
+            total += tempW;
+        }
+    }
+
+
+    gl_FragColor = vec4(color.rgb/total, 1.0);
+
+
+}
+
